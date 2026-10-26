@@ -1,0 +1,23 @@
+# cache and outputs (regenerate with `make data` / `make backtest`)
+data/
+results/
+models/
+nemosis_cache/
+
+# datasets/ IS committed (small AEMO public-data snapshots, so Colab runs identically; see datasets/README.md)
+
+# secrets, never commit
+*.env
+.env*
+
+# python
+.venv/
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# notebooks / editors / OS
+.ipynb_checkpoints/
+.vscode/
+.DS_Store

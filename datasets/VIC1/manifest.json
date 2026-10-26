@@ -1,0 +1,12 @@
+{
+  "region": "VIC1",
+  "source": "AEMO DISPATCHPRICE (RRP) and DISPATCHREGIONSUM (TOTALDEMAND), 5-minute, averaged to 30 minutes",
+  "timezone": "NEM time (AEST, UTC+10, no daylight saving), naive; timestamps label period START",
+  "actuals_30min": {
+    "rows": 66890,
+    "rrp_first_last": ["2023-01-01 00:00:00", "2026-10-25 23:30:00"],
+    "missing_rrp": 130,
+    "demand_first_last": ["2023-01-01 00:00:00", "2026-07-09 13:30:00"],
+    "missing_demand": 5182
+  }
+}
