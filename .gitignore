@@ -1,7 +1,8 @@
 # cache and outputs (regenerate with `make data` / `make backtest`)
 data/
 results/
-models/
+# fine-tuned checkpoints at the repo root only; src/nem_ts/models/ is source code
+/models/
 nemosis_cache/
 
 # datasets/ IS committed (small AEMO public-data snapshots, so Colab runs identically; see datasets/README.md)
