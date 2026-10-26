@@ -1,0 +1,6 @@
+# Store and check out all text files with LF line endings (Makefile and shell scripts break with CRLF on Linux/Colab).
+* text eol=lf
+
+# Binary files: never touch
+*.parquet binary
+*.png binary
