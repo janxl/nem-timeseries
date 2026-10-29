@@ -1,11 +1,15 @@
-# cache and outputs (regenerate with `make data` / `make backtest`)
+# cache (regenerate with the commands in datasets/README.md)
 data/
-results/
-# fine-tuned checkpoints at the repo root only; src/nem_ts/models/ is source code
-/models/
 nemosis_cache/
 
-# datasets/ IS committed (small AEMO public-data snapshots, so Colab runs identically; see datasets/README.md)
+# Committed on purpose, so the benchmark can be reproduced without a GPU:
+#   datasets/               small AEMO public-data snapshots (see datasets/README.md)
+#   results/                final tables and saved predictions
+#   models/chronos2_ft/     the fine-tuned LoRA adapter (about 5 MB)
+# Any other folder under models/ (new experiments) stays out of git until it is added here.
+# Note: src/nem_ts/models/ is source code, so only the top-level models/ folder is matched.
+/models/*
+!/models/chronos2_ft/
 
 # secrets, never commit
 *.env

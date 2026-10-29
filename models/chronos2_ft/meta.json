@@ -1,0 +1,17 @@
+{
+  "context_days": 14,
+  "num_steps": 1000,
+  "batch_size": 32,
+  "learning_rate": 1e-05,
+  "train_end": "2024-12-31 23:30",
+  "seed": 0,
+  "finetune_mode": "lora",
+  "n_training_prices": 35088,
+  "n_missing": 0,
+  "trained_on": [
+    "2023-01-01 00:00:00",
+    "2024-12-31 23:30:00"
+  ],
+  "seconds": 313,
+  "base_model": "amazon/chronos-2"
+}
