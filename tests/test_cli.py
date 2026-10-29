@@ -36,3 +36,27 @@ def test_unknown_model_is_a_clear_error(tmp_path):
     out = runner.invoke(app, ["backtest", "--data", str(tmp_path / "datasets"), "--results", str(tmp_path / "r"),
                               "--start", "2025-01-10", "--models", "nope"])
     assert out.exit_code != 0
+
+
+def test_another_reference_writes_new_files_and_leaves_the_standard_ones_alone(tmp_path):
+    write_toy_dataset(tmp_path / "datasets")
+    results = tmp_path / "results"
+    base = ["backtest", "--data", str(tmp_path / "datasets"), "--results", str(results), "--start", "2025-01-10",
+            "--models", "naive_yesterday,naive_last_week"]
+    assert runner.invoke(app, base).exit_code == 0
+    folder = results / "VIC1"
+    before = {n: (folder / n).read_bytes() for n in ("metrics.md", "metrics.csv", "significance.csv")}
+
+    out = runner.invoke(app, base + ["--reference", "naive_last_week"])
+    assert out.exit_code == 0, out.output
+    assert (folder / "significance_vs_naive_last_week.csv").exists()
+    assert "`naive_last_week`" in (folder / "metrics_vs_naive_last_week.md").read_text(encoding="utf-8")
+    assert {n: (folder / n).read_bytes() for n in before} == before  # the standard files are unchanged
+
+
+def test_a_reference_without_predictions_is_a_clear_error(tmp_path):
+    write_toy_dataset(tmp_path / "datasets")
+    out = runner.invoke(app, ["backtest", "--data", str(tmp_path / "datasets"), "--results", str(tmp_path / "r"),
+                              "--start", "2025-01-10", "--models", "naive_yesterday,naive_last_week",
+                              "--reference", "lightgbm"])
+    assert out.exit_code != 0 and "no predictions" in out.output

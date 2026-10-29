@@ -16,6 +16,8 @@ from nem_ts.models.registry import REGISTRY, ModelNotReady, get_spec
 from nem_ts.report import metrics_markdown, significance_markdown
 from nem_ts.significance import BLOCK_DAYS, LEVEL, compare_to_reference
 
+DEFAULT_REFERENCE = "chronos2_zs"
+
 app = typer.Typer(help="Benchmark time-series models on NEM prices.", no_args_is_help=True)
 
 
@@ -33,7 +35,12 @@ def backtest(
     data: Optional[Path] = typer.Option(None, help="Folder holding <region>/actuals_30min.parquet (default: datasets/)."),
     results: Path = typer.Option(Path("results"), help="Where predictions and metrics are written."),
     force: bool = typer.Option(False, help="Recompute models even if saved predictions exist."),
-    reference: str = typer.Option("chronos2_zs", help="Model the significance table compares the others against."),
+    reference: str = typer.Option(
+        DEFAULT_REFERENCE,
+        help="Model the significance table compares the others against. The default writes metrics.md and "
+             "significance.csv; any other model writes metrics_vs_<model>.md and significance_vs_<model>.csv "
+             "and leaves the standard files untouched.",
+    ),
     models_dir: Path = typer.Option(Path("models"), help="Where fine-tuned checkpoints are saved (make finetune)."),
 ) -> None:
     """Forecast the next 48 half-hours from every midnight, score the models, and save the results."""
@@ -73,8 +80,15 @@ def backtest(
     if not scored:
         typer.echo("No model has predictions on these origins, nothing to score.")
         raise typer.Exit(1)
+    # The default reference writes the standard files. Any other reference writes its own files and leaves those alone.
+    custom = reference != DEFAULT_REFERENCE
+    if custom and reference not in scored:
+        raise typer.BadParameter(f"reference {reference!r} has no predictions on these origins "
+                                 f"(models with predictions: {', '.join(scored)})")
+    suffix = f"_vs_{reference}" if custom else ""
     table = score_models(scored)
-    table.to_csv(out_dir / "metrics.csv", index_label="model")
+    if not custom:
+        table.to_csv(out_dir / "metrics.csv", index_label="model")
     text = metrics_markdown(
         table,
         title=f"{region} backtest results",
@@ -88,11 +102,12 @@ def backtest(
     if len(scored) > 1:
         ref = reference if reference in scored else next(iter(scored))
         sig = compare_to_reference(scored, ref)
-        sig.to_csv(out_dir / "significance.csv", index_label="model")
+        sig.to_csv(out_dir / f"significance{suffix}.csv", index_label="model")
         text += "\n" + significance_markdown(sig, level=LEVEL, block_days=BLOCK_DAYS)
-    (out_dir / "metrics.md").write_text(text, encoding="utf-8")
+    (out_dir / f"metrics{suffix}.md").write_text(text, encoding="utf-8")
     typer.echo("\n" + text)
-    typer.echo(f"Saved to {out_dir}/ (predictions_<model>.parquet, metrics.csv, metrics.md)")
+    typer.echo(f"Saved to {out_dir}/ (metrics{suffix}.md, significance{suffix}.csv"
+               f"{'' if custom else ', metrics.csv'}, predictions_<model>.parquet)")
 
 
 @app.command()
