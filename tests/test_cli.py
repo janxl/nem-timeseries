@@ -25,7 +25,7 @@ def test_backtest_command_saves_predictions_and_metrics(tmp_path):
     assert (folder / "predictions_naive_last_week.parquet").exists()
     metrics = pd.read_csv(folder / "metrics.csv", index_col="model")
     assert metrics.loc["naive_yesterday", "mae"] == 0.0  # the toy price repeats every day
-    assert "| naive_yesterday |" in (folder / "metrics.md").read_text(encoding="utf-8")
+    assert "| naive_yesterday |" in (folder / "metrics_vs_naive_yesterday.md").read_text(encoding="utf-8")  # default reference not run: first model
 
     again = runner.invoke(app, args)  # second run reuses the saved predictions
     assert "using saved predictions" in again.output
@@ -38,20 +38,22 @@ def test_unknown_model_is_a_clear_error(tmp_path):
     assert out.exit_code != 0
 
 
-def test_another_reference_writes_new_files_and_leaves_the_standard_ones_alone(tmp_path):
+def test_each_reference_gets_its_own_files_and_none_overwrites_another(tmp_path):
     write_toy_dataset(tmp_path / "datasets")
     results = tmp_path / "results"
     base = ["backtest", "--data", str(tmp_path / "datasets"), "--results", str(results), "--start", "2025-01-10",
             "--models", "naive_yesterday,naive_last_week"]
-    assert runner.invoke(app, base).exit_code == 0
+    assert runner.invoke(app, base + ["--reference", "naive_yesterday"]).exit_code == 0
     folder = results / "VIC1"
-    before = {n: (folder / n).read_bytes() for n in ("metrics.md", "metrics.csv", "significance.csv")}
+    names = ("metrics_vs_naive_yesterday.md", "significance_vs_naive_yesterday.csv")
+    before = {n: (folder / n).read_bytes() for n in names}
 
     out = runner.invoke(app, base + ["--reference", "naive_last_week"])
     assert out.exit_code == 0, out.output
     assert (folder / "significance_vs_naive_last_week.csv").exists()
     assert "`naive_last_week`" in (folder / "metrics_vs_naive_last_week.md").read_text(encoding="utf-8")
-    assert {n: (folder / n).read_bytes() for n in before} == before  # the standard files are unchanged
+    assert {n: (folder / n).read_bytes() for n in names} == before  # the first reference's files are unchanged
+    assert not (folder / "metrics.md").exists() and not (folder / "significance.csv").exists()
 
 
 def test_a_reference_without_predictions_is_a_clear_error(tmp_path):

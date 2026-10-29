@@ -37,9 +37,8 @@ def backtest(
     force: bool = typer.Option(False, help="Recompute models even if saved predictions exist."),
     reference: str = typer.Option(
         DEFAULT_REFERENCE,
-        help="Model the significance table compares the others against. The default writes metrics.md and "
-             "significance.csv; any other model writes metrics_vs_<model>.md and significance_vs_<model>.csv "
-             "and leaves the standard files untouched.",
+        help="Model the significance table compares the others against. Writes metrics_vs_<model>.md and "
+             "significance_vs_<model>.csv, so runs with different references do not overwrite each other.",
     ),
     models_dir: Path = typer.Option(Path("models"), help="Where fine-tuned checkpoints are saved (make finetune)."),
 ) -> None:
@@ -80,15 +79,14 @@ def backtest(
     if not scored:
         typer.echo("No model has predictions on these origins, nothing to score.")
         raise typer.Exit(1)
-    # The default reference writes the standard files. Any other reference writes its own files and leaves those alone.
-    custom = reference != DEFAULT_REFERENCE
-    if custom and reference not in scored:
-        raise typer.BadParameter(f"reference {reference!r} has no predictions on these origins "
-                                 f"(models with predictions: {', '.join(scored)})")
-    suffix = f"_vs_{reference}" if custom else ""
+    # Every reference gets its own files (metrics_vs_<ref>.md, significance_vs_<ref>.csv), so none overwrites another.
+    if reference not in scored:
+        if reference != DEFAULT_REFERENCE:
+            raise typer.BadParameter(f"reference {reference!r} has no predictions on these origins "
+                                     f"(models with predictions: {', '.join(scored)})")
+        reference = next(iter(scored))  # the default reference was not run: use the first model instead
     table = score_models(scored)
-    if not custom:
-        table.to_csv(out_dir / "metrics.csv", index_label="model")
+    table.to_csv(out_dir / "metrics.csv", index_label="model")  # plain scores; the same whatever the reference
     text = metrics_markdown(
         table,
         title=f"{region} backtest results",
@@ -99,15 +97,16 @@ def backtest(
             f"Spike = actual price at or above ${table.attrs['spike_threshold']:.1f}/MWh (top 5% of the evaluated prices).",
         ],
     )
+    saved = ["metrics.csv"]
     if len(scored) > 1:
-        ref = reference if reference in scored else next(iter(scored))
-        sig = compare_to_reference(scored, ref)
-        sig.to_csv(out_dir / f"significance{suffix}.csv", index_label="model")
+        sig = compare_to_reference(scored, reference)
+        sig.to_csv(out_dir / f"significance_vs_{reference}.csv", index_label="model")
         text += "\n" + significance_markdown(sig, level=LEVEL, block_days=BLOCK_DAYS)
-    (out_dir / f"metrics{suffix}.md").write_text(text, encoding="utf-8")
+        saved.append(f"significance_vs_{reference}.csv")
+    (out_dir / f"metrics_vs_{reference}.md").write_text(text, encoding="utf-8")
+    saved.append(f"metrics_vs_{reference}.md")
     typer.echo("\n" + text)
-    typer.echo(f"Saved to {out_dir}/ (metrics{suffix}.md, significance{suffix}.csv"
-               f"{'' if custom else ', metrics.csv'}, predictions_<model>.parquet)")
+    typer.echo(f"Saved to {out_dir}/ ({', '.join(saved)}, predictions_<model>.parquet)")
 
 
 @app.command()
