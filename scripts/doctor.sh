@@ -56,7 +56,6 @@ probe() {  # probe <name> <url>
     || { fail "cannot reach $1 ($2)"; hint "check the network or proxy; this data source is public and needs no key"; }
 }
 probe "AEMO MMSDM archive" "https://www.nemweb.com.au/Data_Archive/Wholesale_Electricity/MMSDM/"
-probe "Open-Meteo historical forecast" "https://historical-forecast-api.open-meteo.com/v1/forecast?latitude=-37.81&longitude=144.96&start_date=2025-01-01&end_date=2025-01-01&hourly=temperature_2m"
 probe "Hugging Face (model weights)" "https://huggingface.co/amazon/chronos-2/resolve/main/config.json"
 
 echo

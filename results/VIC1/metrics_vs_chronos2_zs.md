@@ -12,6 +12,10 @@
 | chronos2_zs | 41.14 | 244.38 | 231.68 | 26.98 | 76.6% | 14.57 |
 | chronos2_zs_cal | 43.13 | 281.20 | 269.79 | 25.32 | 79.6% | 14.98 |
 | chronos2_ft | 40.02 | 244.06 | 228.28 | 25.96 | 77.8% | 14.19 |
+| chronos2_zs_ctx3d | 47.70 | 247.24 | 242.88 | 38.42 | 72.8% | 16.97 |
+| chronos2_zs_ctx7d | 44.21 | 245.86 | 231.34 | 31.30 | 74.5% | 15.58 |
+| chronos2_zs_ctx28d | 42.35 | 271.69 | 233.39 | 25.74 | 76.6% | 14.85 |
+| chronos2_zs_ctx42d | 40.62 | 246.75 | 236.17 | 25.49 | 76.5% | 14.41 |
 
 Errors are in $/MWh. MAE, RMSE and pinball: lower is better; coverage should be near 80%.
 
@@ -26,5 +30,9 @@ Paired by forecast day (635 origins); 95% confidence intervals from a 7-day bloc
 | lightgbm | +0.62 [-0.74, +1.92] | 46% | +0.41 [-0.15, +0.93] |
 | chronos2_zs_cal | +1.99 [-0.37, +6.20] | 50% | +0.41 [-0.03, +1.14] |
 | chronos2_ft | -1.11 [-1.52, -0.77] * | 60% | -0.39 [-0.55, -0.25] * |
+| chronos2_zs_ctx3d | +6.56 [+5.32, +7.69] * | 30% | +2.40 [+1.84, +3.13] * |
+| chronos2_zs_ctx7d | +3.08 [+2.30, +3.88] * | 35% | +1.00 [+0.72, +1.34] * |
+| chronos2_zs_ctx28d | +1.21 [-1.03, +5.29] | 57% | +0.28 [-0.32, +1.36] |
+| chronos2_zs_ctx42d | -0.51 [-1.14, +0.13] | 58% | -0.17 [-0.35, +0.03] |
 
 Differences are in $/MWh. "Better on % of days" compares the daily MAE of the model with the reference.
