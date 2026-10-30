@@ -2,7 +2,12 @@
 
 Forecasting Victorian (VIC1) electricity prices a day ahead with Amazon's
 [Chronos-2](https://huggingface.co/amazon/chronos-2), compared with baselines and then fine-tuned.
-Uses **public AEMO data only**. What it found: **[RESULTS.md](RESULTS.md)**.
+The prices come from Australia's National Electricity Market (NEM), published by the market operator AEMO.
+Uses **public data only**.
+
+**Headline:** Chronos-2 with no training of its own ties a LightGBM model trained on two years of this data, and a
+5-minute fine-tune on a GPU makes it the best model (about 4% lower error than LightGBM, a gap unlikely to be luck).
+The full results and caveats are in **[RESULTS.md](RESULTS.md)**.
 
 [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/janxl/nem-timeseries/blob/main/notebooks/colab.ipynb)
 
@@ -112,5 +117,5 @@ fork the repo, change `REPO_URL` in the notebook's first cell.
 ## Licences
 
 Code: MIT. Data: (c) Australian Energy Market Operator Limited, used under
-[AEMO's copyright permissions](https://www.aemo.com.au/Privacy-and-Legal-Notices/Copyright-Permissions-Notice).
+[AEMO's copyright permissions](https://aemo.com.au/privacy-and-legal-notices/copyright-permissions).
 Model: derived from [`amazon/chronos-2`](https://huggingface.co/amazon/chronos-2) (Apache-2.0).

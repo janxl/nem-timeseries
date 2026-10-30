@@ -7,7 +7,7 @@ A small snapshot of public AEMO data, committed so the benchmark (and the Colab 
 - **AEMO NEM data:** dispatch prices (`DISPATCHPRICE`, column `RRP`) and regional demand (`DISPATCHREGIONSUM`,
   column `TOTALDEMAND`), 5-minute, averaged here to 30 minutes.
 - **Attribution:** Data (c) Australian Energy Market Operator Limited. Used under AEMO's
-  [copyright permissions](https://www.aemo.com.au/Privacy-and-Legal-Notices/Copyright-Permissions-Notice).
+  [copyright permissions](https://aemo.com.au/privacy-and-legal-notices/copyright-permissions).
 - Only public data is used.
 
 ## Files
