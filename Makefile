@@ -15,7 +15,7 @@ RUN ?= uv run
 export PATH := $(HOME)/.local/bin:$(PATH)
 
 .DEFAULT_GOAL := help
-.PHONY: help doctor setup backtest finetune test
+.PHONY: help doctor setup backtest finetune report test
 
 help:  ## show this list
 	@awk 'BEGIN {FS = ":.*## "} /^[a-zA-Z_-]+:.*## / {printf "  make %-18s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -27,7 +27,7 @@ doctor:  ## check this machine is ready (tools, disk, network) and say how to fi
 
 setup:  ## install uv if missing, then create the virtualenv (outside the repo) with all dependencies
 	@command -v uv >/dev/null 2>&1 || { echo "installing uv..."; curl -LsSf https://astral.sh/uv/install.sh | sh; }
-	uv sync --extra models --extra dev
+	uv sync --extra models --extra dev --extra report
 	@echo; echo "Ready. Virtualenv: $(VENV). Run commands with: uv run <cmd>"
 
 # ---- backtest: forecast the next 48 half-hours from every midnight since 2025-01-01, score, save to results/
@@ -41,6 +41,11 @@ backtest:  ## run the rolling backtest for all registered models; writes results
 
 finetune:  ## fine-tune Chronos-2 on 2023-24 prices (LoRA) and save the checkpoint to models/
 	$(RUN) nem-ts finetune $(ARGS)
+
+# ---- Excel report of the daily forecasts: actual price vs P10/P50/P90, half-hour by half-hour (from the saved predictions)
+
+report:  ## build results/<region>/daily_forecasts.xlsx: pick a day and see actual vs forecast (opens best in Excel)
+	$(RUN) python scripts/build_daily_forecasts_xlsx.py $(ARGS)
 
 test:  ## run the unit tests
 	$(RUN) pytest -q

@@ -11,6 +11,10 @@ nemosis_cache/
 /models/*
 !/models/chronos2_ft/
 
+# generated Excel report (make report) and Excel's temporary lock files
+*.xlsx
+~$*
+
 # secrets, never commit
 *.env
 .env*

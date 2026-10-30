@@ -1119,6 +1119,9 @@ models = [
     { name = "torch", version = "2.14.1", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
     { name = "torch", version = "2.14.1+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform != 'darwin'" },
 ]
+report = [
+    { name = "openpyxl" },
+]
 
 [package.metadata]
 requires-dist = [
@@ -1127,6 +1130,7 @@ requires-dist = [
     { name = "lightgbm", specifier = ">=4.3" },
     { name = "matplotlib", specifier = ">=3.8" },
     { name = "nemosis", specifier = ">=3.8" },
+    { name = "openpyxl", marker = "extra == 'report'", specifier = ">=3.1" },
     { name = "pandas", extras = ["pyarrow"], specifier = ">=2.2" },
     { name = "peft", marker = "extra == 'models'", specifier = ">=0.10" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
@@ -1135,7 +1139,7 @@ requires-dist = [
     { name = "torch", marker = "extra == 'models'", specifier = ">=2.3", index = "https://download.pytorch.org/whl/cpu" },
     { name = "typer", specifier = ">=0.12" },
 ]
-provides-extras = ["models", "dev"]
+provides-extras = ["models", "report", "dev"]
 
 [[package]]
 name = "nemosis"
